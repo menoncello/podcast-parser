@@ -1,0 +1,40 @@
+{
+  "name": "podcast-parser",
+  "version": "1.0.0",
+  "description": "Feed parser with focus in podcasts",
+  "main": "index.js",
+  "dependencies": {
+    "bluebird": "^3.3.5",
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5",
+    "mockery": "^1.6.2",
+    "request": "^2.72.0",
+    "rewire": "^2.5.1",
+    "sinon": "^1.17.3",
+    "string": "^3.3.1",
+    "underscore": "^1.8.3",
+    "xml2js": "^0.4.16"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/menoncello/podcast-parser.git"
+  },
+  "keywords": [
+    "podcast",
+    "feed",
+    "rss",
+    "parser",
+    "xml",
+    "parser"
+  ],
+  "author": "Eduardo Menoncello",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/menoncello/podcast-parser/issues"
+  },
+  "homepage": "https://github.com/menoncello/podcast-parser#readme"
+}
