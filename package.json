@@ -1,6 +1,6 @@
 {
   "name": "podcast-parser",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Feed parser with focus in podcasts",
   "main": "index.js",
   "dependencies": {
