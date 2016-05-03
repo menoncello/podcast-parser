@@ -28,7 +28,7 @@ function execute(url, options, callback) {
       return;
     }
 
-    callback(data);
+    callback(null, data);
   }
 }
 
