@@ -1,21 +1,20 @@
-(function () {
-  'use strict';
+'use strict';
 
-  let chai = require('chai');
-  let should = chai.should();
-  let sinon = require('sinon');
-  let mockery = require('mockery');
+let chai = require('chai');
+let should = chai.should();
+let sinon = require('sinon');
+let mockery = require('mockery');
 
-  let sandbox = sinon.sandbox.create();
-  let request = function (url, callback) {
+let sandbox = sinon.sandbox.create();
+let request = function (url, callback) {
     callback();
   };
 
-  let podcastParser;
+let podcastParser;
 
-  describe('parse', function () {
+describe('parse', function () {
 
-    before(function () {
+  before(function () {
       mockery.enable({
         warnOnReplace: false,
         warnOnUnregistered: false,
@@ -23,7 +22,7 @@
       });
     });
 
-    beforeEach(function () {
+  beforeEach(function () {
       mockery.registerMock('request', request);
       mockery.registerAllowable('../index.js');
       mockery.registerAllowable('string');
@@ -32,44 +31,387 @@
       podcastParser = require('../index.js');
     });
 
-    afterEach(function () {
+  afterEach(function () {
       sandbox.verifyAndRestore();
       mockery.resetCache();
       mockery.deregisterAll();
     });
 
-    after(function () {
+  after(function () {
       mockery.disable();
     });
 
-    it('parse - should return error if data is empty', function (done) {
-
-      podcastParser.parse('', {}, function (err, data) {
+  it('should return error if data is empty', function (done) {
+    podcastParser.parse('', {}, function (err, data) {
         should.exist(err);
         done();
       });
+  });
 
+  it('should return existing object when passing a xml only with the rss',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss></rss>';
+
+      podcastParser.parse(xml, {}, function (err, data) {
+        should.exist(data);
+        done();
+      });
     });
 
-    it('parse - should return existing object when passing a xml only with the rss',
-      function (done) {
-        let xml = '<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"></rss>';
+  it('should return version \'2.0\' when passing a xml only with the rss',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"></rss>';
 
-        podcastParser.parse(xml, {}, function (err, data) {
-          should.exist(data);
-          done();
-        });
+      podcastParser.parse(xml, {}, function (err, data) {
+        data.version.should.equal('2.0');
+        done();
       });
+    });
 
-    it('parse - should return version \'2.0\' when passing a xml only with the rss',
-      function (done) {
-        let xml = '<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"></rss>';
+  it('should channel exists when passing a channel element in the feed',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel></channel></rss>';
 
-        podcastParser.parse(xml, {}, function (err, data) {
-          console.log(data);
-          data.version.should.equal('2.0');
-          done();
-        });
+      podcastParser.parse(xml, {}, function (err, data) {
+        should.exist(data.channel);
+        done();
       });
-  });
-})();
+    });
+
+  it('should channel be a object when passing a channel element in the feed',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel>' +
+        '</channel></rss>';
+
+      podcastParser.parse(xml, {}, function (err, data) {
+        data.channel.should.be.a('object');
+        done();
+      });
+    });
+
+  it('should return existing items when passing a xml only with the rss',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss></rss>';
+
+      podcastParser.parse(xml, {}, function (err, data) {
+        should.exist(data.channel.items);
+        done();
+      });
+    });
+
+  it('should return existing items when passing a xml only with the rss',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss></rss>';
+
+      podcastParser.parse(xml, {}, function (err, data) {
+        data.channel.items.should.be.a('array');
+        done();
+      });
+    });
+
+  it('should title equals to \'Nerdcast – Jovem Nerd\' when passing the title element',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel>' +
+        '<title>Nerdcast &#8211; Jovem Nerd</title></channel></rss>';
+
+      podcastParser.parse(xml, {}, function (err, data) {
+        data.channel.title.should.equal('Nerdcast – Jovem Nerd');
+        done();
+      });
+    });
+
+  it('should link equals to \'https://jovemnerd.com.br\' when passing the link element',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel>' +
+        '<link>https://jovemnerd.com.br</link></channel></rss>';
+
+      podcastParser.parse(xml, {}, function (err, data) {
+        data.channel.link.should.equal('https://jovemnerd.com.br');
+        done();
+      });
+    });
+
+  it('should description equals to \'O mundo pop vira piada no Jovem Nerd\' when passing ' +
+      'the description element',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel>' +
+        '<description>O mundo pop vira piada no Jovem Nerd</description></channel></rss>';
+
+      podcastParser.parse(xml, {}, function (err, data) {
+        data.channel.description.should.equal('O mundo pop vira piada no Jovem Nerd');
+        done();
+      });
+    });
+
+  it('should language equals to \'pt-BR\' when passing the language element',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel>' +
+        '<language>pt-BR</language></channel></rss>';
+
+      podcastParser.parse(xml, {}, function (err, data) {
+        data.channel.language.should.equal('pt-BR');
+        done();
+      });
+    });
+
+  it('should items have 3 items when passing 3 tags',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel>' +
+        '<item></item><item></item><item></item></channel></rss>';
+
+      podcastParser.parse(xml, {}, function (err, data) {
+        data.channel.items.length.should.equal(3);
+        done();
+      });
+    });
+
+  it('should the first item have the title \'Nerdcast 514 – Turistas Babacas 2\' ' +
+    'when the title tag',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+        '<title>Nerdcast 514 &#8211; Turistas Babacas 2</title></item></channel></rss>';
+
+      podcastParser.parse(xml, {}, function (err, data) {
+        data.channel.items[0].title.should.equal('Nerdcast 514 – Turistas Babacas 2');
+        done();
+      });
+    });
+
+  it('should the first item have the link ' +
+    '\'https://jovemnerd.com.br/nerdcast/nerdcast-514-turistas-babacas-2/\' when the link tag',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+        '<link>https://jovemnerd.com.br/nerdcast/nerdcast-514-turistas-babacas-2/</link>' +
+        '</item></channel></rss>';
+
+      podcastParser.parse(xml, {}, function (err, data) {
+        data.channel.items[0].link.should
+          .equal('https://jovemnerd.com.br/nerdcast/nerdcast-514-turistas-babacas-2/');
+        done();
+      });
+    });
+
+  it('should the first item have the pubDate ' +
+    '\'Fri, 29 Apr 2016 06:28:29 +0000\' when the link tag and options set date as string',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+        '<pubDate>Fri, 29 Apr 2016 06:28:29 +0000</pubDate>' +
+        '</item></channel></rss>';
+
+      podcastParser.parse(xml, { dateAs: 'string' }, function (err, data) {
+        data.channel.items[0].pubDate.should.equal('Fri, 29 Apr 2016 06:28:29 +0000');
+        done();
+      });
+    });
+
+  it('should the first item have the pubDate ' +
+    '\'Fri, 29 Apr 2016 06:28:29 +0000\' when the link tag and options',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+        '<pubDate>Fri, 29 Apr 2016 06:28:29 +0000</pubDate>' +
+        '</item></channel></rss>';
+
+      podcastParser.parse(xml, { }, function (err, data) {
+        data.channel.items[0].pubDate.should.equal('Fri, 29 Apr 2016 06:28:29 +0000');
+        done();
+      });
+    });
+
+  it('should the first item have the pubDate ' +
+    '\'20160329062829\' when the link tag and options set date as number',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+        '<pubDate>Fri, 29 Apr 2016 06:28:29 +0000</pubDate>' +
+        '</item></channel></rss>';
+
+      podcastParser.parse(xml, { dateAs: 'number' }, function (err, data) {
+        data.channel.items[0].pubDate.should.equal(20160329062829);
+        done();
+      });
+    });
+
+  it('should the first item have the pubDate \'Fri, 29 Apr 2016 06:28:29 +0000\' as date ' +
+    'when the link tag and options set date as string',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+        '<pubDate>Fri, 29 Apr 2016 06:28:29 +0000</pubDate>' +
+        '</item></channel></rss>';
+
+      podcastParser.parse(xml, { dateAs: 'date' }, function (err, data) {
+        data.channel.items[0].pubDate.should.be.eql(new Date(2016, 3, 29, 6, 28, 29));
+        done();
+      });
+    });
+
+  it('should the first item have the pubDate [2016, 3, 29, 6, 28, 29] ' +
+    'when the link tag and options set date as array',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+        '<pubDate>Fri, 29 Apr 2016 06:28:29 +0000</pubDate>' +
+        '</item></channel></rss>';
+
+      podcastParser.parse(xml, { dateAs: 'array' }, function (err, data) {
+        data.channel.items[0].pubDate.should.be.eql([2016, 3, 29, 6, 28, 29]);
+        done();
+      });
+    });
+
+  it('should the first item have the description \'<p>Hoje Alexandre Ottoni o Jovem Nerd, Sr. K, ' +
+    'Guga Mafra, Portuguesa e Deive Pazos o Azaghal colocam seus monóculos para a segunda parte ' +
+    'de Turistas Babacas!</p><p>O post Nerdcast 514 – Turistas Babacas 2 apareceu primeiro' +
+    ' em Jovem Nerd.</p>\' when the link tag and options set date as array',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+        '<description><![CDATA[<p>Hoje Alexandre Ottoni o Jovem Nerd, Sr. K, Guga Mafra, ' +
+        'Portuguesa e Deive Pazos o Azaghal colocam seus monóculos para a segunda parte de ' +
+        'Turistas Babacas!</p><p>O post Nerdcast 514 &#8211; Turistas Babacas 2 apareceu primeiro' +
+        ' em Jovem Nerd.</p>]]></description></item></channel></rss>';
+
+      podcastParser.parse(xml, {}, function (err, data) {
+        data.channel.items[0].description.should.equal('<p>Hoje Alexandre Ottoni o Jovem Nerd, ' +
+          'Sr. K, Guga Mafra, Portuguesa e Deive Pazos o Azaghal colocam seus monóculos para a ' +
+          'segunda parte de Turistas Babacas!</p><p>O post Nerdcast 514 – Turistas Babacas ' +
+          '2 apareceu primeiro em Jovem Nerd.</p>');
+        done();
+      });
+    });
+
+  it('should the first item have the duration 1:41:56 ' +
+    'when the link tag \'itunes:duration\'',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+        '<itunes:duration>1:41:56</itunes:duration>' +
+        '</item></channel></rss>';
+
+      podcastParser.parse(xml, {}, function (err, data) {
+        data.channel.items[0].duration.should.equal('1:41:56');
+        done();
+      });
+    });
+
+  it('should the first item have the duration [1,41,56] ' +
+    'when the link tag \'itunes:duration\' and set time as array',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+        '<itunes:duration>1:41:56</itunes:duration>' +
+        '</item></channel></rss>';
+
+      podcastParser.parse(xml, { timeAs: 'array' }, function (err, data) {
+        data.channel.items[0].duration.should.be.eql([1, 41, 56]);
+        done();
+      });
+    });
+
+  it('should the first item have the duration 14156 ' +
+    'when the link tag \'itunes:duration\' and set time as number',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+        '<itunes:duration>1:41:56</itunes:duration>' +
+        '</item></channel></rss>';
+
+      podcastParser.parse(xml, { timeAs: 'number' }, function (err, data) {
+        data.channel.items[0].duration.should.equal(14156);
+        done();
+      });
+    });
+
+  it('should the first item have a enclosure when the link tag \'enclosure\'',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+        '<enclosure url="https://jovemnerd.com.br/podpress_trac/feed/148003/0/nc514.mp3" ' +
+        'length="73512785" type="audio/mpeg" />' +
+        '</item></channel></rss>';
+
+      podcastParser.parse(xml, {}, function (err, data) {
+        should.exist(data.channel.items[0].enclosure);
+        done();
+      });
+    });
+
+  it('should the first item have a enclosure with url, length and type when the link tag' +
+      ' \'enclosure\'',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+        '<enclosure url="https://jovemnerd.com.br/podpress_trac/feed/148003/0/nc514.mp3" ' +
+        'length="73512785" type="audio/mpeg" />' +
+        '</item></channel></rss>';
+
+      podcastParser.parse(xml, {}, function (err, data) {
+        data.channel.items[0].enclosure.should.be.eql({
+          url: 'https://jovemnerd.com.br/podpress_trac/feed/148003/0/nc514.mp3',
+          length: 73512785,
+          type: 'audio/mpeg',
+        });
+        done();
+      });
+    });
+
+  it('should the first item have a subtitle when the \'Hoje Alexandre Ottoni o Jovem Nerd, Sr. K,' +
+      ' Guga Mafra, Portuguesa e Deive Pazos o Azaghal colocam seus monóculos para a segunda ' +
+      'parte de Turistas Babacas! O post Nerdcast 514 – Turistas Babacas 2 apareceu ' +
+      'primeiro em Jovem Nerd.\' tag \'itunes:subtitle\'',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+        '<itunes:subtitle>Hoje Alexandre Ottoni o Jovem Nerd, Sr. K, Guga Mafra, Portuguesa e ' +
+        'Deive Pazos o Azaghal colocam seus monóculos para a segunda parte de Turistas Babacas! O' +
+        ' post Nerdcast 514 &#8211; Turistas Babacas 2 apareceu primeiro em Jovem Nerd.' +
+        '</itunes:subtitle>' +
+        '</item></channel></rss>';
+
+      podcastParser.parse(xml, {}, function (err, data) {
+        data.channel.items[0].subtitle.should.equal('Hoje Alexandre Ottoni o Jovem Nerd, Sr. K,' +
+          ' Guga Mafra, Portuguesa e Deive Pazos o Azaghal colocam seus monóculos para a segunda ' +
+          'parte de Turistas Babacas! O post Nerdcast 514 – Turistas Babacas 2 apareceu ' +
+          'primeiro em Jovem Nerd.');
+        done();
+      });
+    });
+
+  it('should the first item have a summary when the \'Hoje Alexandre Ottoni o Jovem Nerd, Sr. K,' +
+      ' Guga Mafra, Portuguesa e Deive Pazos o Azaghal colocam seus monóculos para a segunda ' +
+      'parte de Turistas Babacas! O post Nerdcast 514 – Turistas Babacas 2 apareceu ' +
+      'primeiro em Jovem Nerd.\' tag \'itunes:summary\'',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+        '<itunes:summary>Hoje Alexandre Ottoni o Jovem Nerd, Sr. K, Guga Mafra, Portuguesa e ' +
+        'Deive Pazos o Azaghal colocam seus monóculos para a segunda parte de Turistas Babacas! O' +
+        ' post Nerdcast 514 &#8211; Turistas Babacas 2 apareceu primeiro em Jovem Nerd.' +
+        '</itunes:summary>' +
+        '</item></channel></rss>';
+
+      podcastParser.parse(xml, {}, function (err, data) {
+        data.channel.items[0].summary.should.equal('Hoje Alexandre Ottoni o Jovem Nerd, Sr. K,' +
+          ' Guga Mafra, Portuguesa e Deive Pazos o Azaghal colocam seus monóculos para a segunda ' +
+          'parte de Turistas Babacas! O post Nerdcast 514 – Turistas Babacas 2 apareceu ' +
+          'primeiro em Jovem Nerd.');
+        done();
+      });
+    });
+
+  it('should the first item have a content when the \'<p><strong>Neste Podcast:</strong> Vá para ' +
+      'uma festa em um castelo em praga, se inspire na família Griswald e conheça o Willy Wonka ' +
+      'do inferno!</p><blockquote><p><strong>ARTE DA VITRINE: <strong><em><a ' +
+      'href="http://www.cirosollero.com/">Ciro Sollero</a></em></strong></strong></p>' +
+      '</blockquote><h3>N­PIX | Escola online de artes digitais</h3><p>Acesse: <a ' +
+      'href="http://bit.ly/1NWTv83">http://bit.ly/1NWTv83</a></p>.\' tag \'content:encoded\'',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+        '<content:encoded><![CDATA[<p><strong>Neste Podcast:</strong> Vá para uma festa em um ' +
+        'castelo em praga, se inspire na família Griswald e conheça o Willy Wonka do inferno!</p>' +
+        '<blockquote><p><strong>ARTE DA VITRINE: <strong><em><a ' +
+        'href="http://www.cirosollero.com/">Ciro Sollero</a></em></strong></strong></p>' +
+        '</blockquote><h3>N­PIX | Escola online de artes digitais</h3><p>Acesse: <a ' +
+        'href="http://bit.ly/1NWTv83">http://bit.ly/1NWTv83</a></p>]]></content:encoded>' +
+        '</item></channel></rss>';
+
+      podcastParser.parse(xml, {}, function (err, data) {
+        data.channel.items[0].content.should.equal('<p><strong>Neste Podcast:</strong> Vá para ' +
+            'uma festa em um castelo em praga, se inspire na família Griswald e conheça o Willy ' +
+            'Wonka do inferno!</p><blockquote><p><strong>ARTE DA VITRINE: <strong><em><a ' +
+            'href="http://www.cirosollero.com/">Ciro Sollero</a></em></strong></strong></p>' +
+            '</blockquote><h3>N­PIX | Escola online de artes digitais</h3><p>Acesse: <a ' +
+            'href="http://bit.ly/1NWTv83">http://bit.ly/1NWTv83</a></p>');
+        done();
+      });
+    });
+});
