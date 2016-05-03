@@ -19,7 +19,7 @@
     "mocha": "^2.4.5"
   },
   "scripts": {
-    "test": "mocha tests"
+    "test": "node_modules/mocha/bin/mocha tests"
   },
   "repository": {
     "type": "git",
