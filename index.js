@@ -59,8 +59,8 @@ function parse(xml, options, callback) {
       return;
     }
 
+    let result = {};
     try {
-      let result = {};
       let channel = _.compact(res.rss.channel);
 
       if (res.rss.$) {
