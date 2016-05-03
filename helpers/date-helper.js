@@ -1,3 +1,5 @@
+'use strict';
+
 let S = require('string');
 
 exports.month = monthHelper;
