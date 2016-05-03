@@ -1,9 +1,9 @@
 
 'use strict';
 
-let dateHelper = require('../helpers/date-helper.js');
-let chai = require('chai');
-let should = chai.should();
+var dateHelper = require('../helpers/date-helper.js');
+var chai = require('chai');
+var should = chai.should();
 
 describe('date helper - month', function () {
 
