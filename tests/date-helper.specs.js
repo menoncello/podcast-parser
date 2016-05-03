@@ -1,4 +1,3 @@
-
 'use strict';
 
 var dateHelper = require('../helpers/date-helper.js');
@@ -49,7 +48,7 @@ describe('date helper - month', function () {
   tests.forEach(function (test) {
 
     it('should returns ' + test.expected + ' when have \'' + test.arg + '\'', function () {
-        let result = dateHelper.month(test.arg);
+        var result = dateHelper.month(test.arg);
         result.should.equal(test.expected);
       });
   });
@@ -65,7 +64,7 @@ describe('date helper - date array', function () {
   tests.forEach(function (test) {
 
     it('should returns [' + test.expected + '] when have \'' + test.arg + '\'', function () {
-        let result = dateHelper.arrayDate(test.arg);
+        var result = dateHelper.arrayDate(test.arg);
         result.should.to.eql(test.expected);
       });
   });
@@ -81,7 +80,7 @@ describe('date helper - date number', function () {
   tests.forEach(function (test) {
 
     it('should returns ' + test.expected + ' when have \'' + test.arg + '\'', function () {
-        let result = dateHelper.numberDate(test.arg);
+        var result = dateHelper.numberDate(test.arg);
         result.should.to.equal(test.expected);
       });
   });
@@ -97,7 +96,7 @@ describe('date helper - date', function () {
   tests.forEach(function (test) {
 
     it('should returns [' + test.expected + '] when have ' + test.arg, function () {
-        let result = dateHelper.date(test.arg);
+        var result = dateHelper.date(test.arg);
         result.should.to.eql(test.expected);
       });
   });
