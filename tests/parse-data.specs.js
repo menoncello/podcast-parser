@@ -193,16 +193,29 @@ describe('parse', function () {
 
   it('should the first item have the pubDate ' +
     '\'Fri, 29 Apr 2016 06:28:29 +0000\' when the link tag and options set date as string',
-    function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
-        '<pubDate>Fri, 29 Apr 2016 06:28:29 +0000</pubDate>' +
-        '</item></channel></rss>';
+      function (done) {
+        let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+          '<pubDate>Fri, 29 Apr 2016 06:28:29 +0000</pubDate>' +
+          '</item></channel></rss>';
 
-      podcastParser.parse(xml, { dateAs: 'string' }, function (err, data) {
-        data.channel.items[0].pubDate.should.equal('Fri, 29 Apr 2016 06:28:29 +0000');
-        done();
+        podcastParser.parse(xml, { dateAs: 'string' }, function (err, data) {
+          data.channel.items[0].pubDate.should.equal('Fri, 29 Apr 2016 06:28:29 +0000');
+          done();
+        });
       });
-    });
+
+  it('should the first item have the pubDate as type of string ' +
+    '\'Fri, 29 Apr 2016 06:28:29 +0000\' when the link tag and options set date as string',
+      function (done) {
+        let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+          '<pubDate>Fri, 29 Apr 2016 06:28:29 +0000</pubDate>' +
+          '</item></channel></rss>';
+
+        podcastParser.parse(xml, { dateAs: 'string' }, function (err, data) {
+          data.channel.items[0].pubDate.should.to.be.a('string');
+          done();
+        });
+      });
 
   it('should the first item have the pubDate ' +
     '\'Fri, 29 Apr 2016 06:28:29 +0000\' when the link tag and options',
@@ -226,6 +239,32 @@ describe('parse', function () {
 
       podcastParser.parse(xml, { dateAs: 'number' }, function (err, data) {
         data.channel.items[0].pubDate.should.equal(20160329062829);
+        done();
+      });
+    });
+
+  it('should the first item have the pubDate to be a `number` ' +
+    ' when the link tag and options set date as number',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+        '<pubDate>Fri, 29 Apr 2016 06:28:29 +0000</pubDate>' +
+        '</item></channel></rss>';
+
+      podcastParser.parse(xml, { dateAs: 'number' }, function (err, data) {
+        data.channel.items[0].pubDate.should.to.be.a('number');
+        done();
+      });
+    });
+
+  it('should the first item have the pubDate as `date`' +
+    'when the link tag and options set date as string',
+    function (done) {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+        '<pubDate>Fri, 29 Apr 2016 06:28:29 +0000</pubDate>' +
+        '</item></channel></rss>';
+
+      podcastParser.parse(xml, { dateAs: 'date' }, function (err, data) {
+        data.channel.items[0].pubDate.should.to.be.a('date');
         done();
       });
     });
