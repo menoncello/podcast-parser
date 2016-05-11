@@ -51,7 +51,11 @@ function parse(xml, options, callback) {
     return;
   }
 
-  parseString(xml, parsed);
+  try {
+    parseString(xml, parsed);
+  } catch (ex) {
+    parsed(ex);
+  }
 
   function parsed(err, res) {
     if (err) {
