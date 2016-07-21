@@ -20,7 +20,7 @@ function execute(url, options, callback) {
       return;
     }
 
-    parse(data, options, parsed);
+	  parse(data.body || data, options, parsed);
   }
 
   function parsed(err, data) {
