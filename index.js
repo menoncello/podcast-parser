@@ -46,7 +46,7 @@ function download(url, options, callback) {
   options = options || {};
 
   let requestOptions = {
-  	timeout: options.timeout || 30
+  	timeout: options.timeout || 30000
   };
 
   request(url, requestOptions, downloaded);

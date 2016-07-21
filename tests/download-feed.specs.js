@@ -82,23 +82,23 @@ describe('download', function () {
     });
   });
 
-	it('download - the default timeout must be 30', function (done) {
+	it('download - the default timeout must be 30000', function (done) {
 		mockery.registerMock('request', requestTimeout);
 		podcastParser = require('../index.js');
 
 		podcastParser.download('asd', function (err, data) {
-			data.timeout.should.be.equal(30);
+			data.timeout.should.be.equal(30000);
 			done();
 		});
 
 	});
 
-	it('download - timeout should be 60 when passing 60 as timeout in the options', function (done) {
+	it('download - timeout should be 60 when passing 60000 as timeout in the options', function (done) {
 		mockery.registerMock('request', requestTimeout);
 		podcastParser = require('../index.js');
 
-		podcastParser.download('asd', { timeout: 60 }, function (err, data) {
-			data.timeout.should.be.equal(60);
+		podcastParser.download('asd', { timeout: 60000 }, function (err, data) {
+			data.timeout.should.be.equal(60000);
 			done();
 		});
 
