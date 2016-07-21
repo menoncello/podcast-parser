@@ -1,12 +1,15 @@
 'use strict';
 
-var dateHelper = require('../helpers/date-helper.js');
-var chai = require('chai');
-var should = chai.should();
+const dateHelper = require('../helpers/date-helper.js');
+const chai = require('chai');
+const should = chai.should();
+
+const describe = require("mocha").describe;
+const it = require("mocha").it;
 
 describe('date helper - month', function () {
 
-  var tests = [
+  const tests = [
     { arg: 'jan', expected: 0 },
     { arg: 'Jan', expected: 0 },
     { arg: 'JAN', expected: 0 },
@@ -48,7 +51,7 @@ describe('date helper - month', function () {
   tests.forEach(function (test) {
 
     it('should returns ' + test.expected + ' when have \'' + test.arg + '\'', function () {
-        var result = dateHelper.month(test.arg);
+        let result = dateHelper.month(test.arg);
         result.should.equal(test.expected);
       });
   });
@@ -56,7 +59,7 @@ describe('date helper - month', function () {
 
 describe('date helper - date array', function () {
 
-  var tests = [
+  const tests = [
     { arg: 'Fri, 29 Apr 2016 06:34:22 +0000', expected: [2016, 3, 29, 6, 34, 22] },
     { arg: 'Fri, 22 Apr 2016 03:01:00 +0000', expected: [2016, 3, 22, 3, 1, 0] },
   ];
@@ -72,7 +75,7 @@ describe('date helper - date array', function () {
 
 describe('date helper - date number', function () {
 
-  var tests = [
+  const tests = [
     { arg: 'Fri, 29 Apr 2016 06:34:22 +0000', expected: 20160329063422 },
     { arg: 'Fri, 22 Apr 2016 03:01:00 +0000', expected: 20160322030100 },
   ];
@@ -80,7 +83,7 @@ describe('date helper - date number', function () {
   tests.forEach(function (test) {
 
     it('should returns ' + test.expected + ' when have \'' + test.arg + '\'', function () {
-        var result = dateHelper.numberDate(test.arg);
+        let result = dateHelper.numberDate(test.arg);
         result.should.to.equal(test.expected);
       });
   });
@@ -88,7 +91,7 @@ describe('date helper - date number', function () {
 
 describe('date helper - date', function () {
 
-  var tests = [
+  const tests = [
     { arg: 'Fri, 29 Apr 2016 06:34:22 +0000', expected: new Date(2016, 3, 29, 6, 34, 22) },
     { arg: 'Fri, 22 Apr 2016 03:01:00 +0000', expected: new Date(2016, 3, 22, 3, 1, 0) },
   ];
@@ -96,7 +99,7 @@ describe('date helper - date', function () {
   tests.forEach(function (test) {
 
     it('should returns [' + test.expected + '] when have ' + test.arg, function () {
-        var result = dateHelper.date(test.arg);
+        let result = dateHelper.date(test.arg);
         result.should.to.eql(test.expected);
       });
   });

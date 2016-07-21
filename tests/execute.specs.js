@@ -1,11 +1,18 @@
 'use strict';
 
-let chai = require('chai');
-let should = chai.should();
-let sinon = require('sinon');
-let mockery = require('mockery');
+const chai = require('chai');
+const should = chai.should();
+const sinon = require('sinon');
+const mockery = require('mockery');
 
-let sandbox = sinon.sandbox.create();
+const after = require("mocha").after;
+const afterEach = require("mocha").afterEach;
+const beforeEach = require("mocha").beforeEach;
+const before = require("mocha").before;
+const describe = require("mocha").describe;
+const it = require("mocha").it;
+
+const sandbox = sinon.sandbox.create();
 let request = function (url, callback) {
   callback();
 };
@@ -43,7 +50,7 @@ describe('execute', function () {
 
   it('execute - should return error if url is empty', function (done) {
 
-    podcastParser.execute('', {}, function (err, data) {
+    podcastParser.execute('', {}, function (err) {
       should.exist(err);
       done();
     });

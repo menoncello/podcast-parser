@@ -1,13 +1,22 @@
 'use strict';
 
-let chai = require('chai');
-let should = chai.should();
-let sinon = require('sinon');
-let mockery = require('mockery');
-let requestNerdcast = require('./stubs/request-nerdcast.js');
+const chai = require('chai');
+const should = chai.should();
+const sinon = require('sinon');
+const mockery = require('mockery');
+const requestNerdcast = require('./stubs/request-nerdcast');
+const requestTimeout = require('./stubs/request-timeout');
+const requestTimeoutError = require('./stubs/request-timeout-error');
 
-let sandbox = sinon.sandbox.create();
-let request = function (url, callback) {
+const after = require("mocha").after;
+const afterEach = require("mocha").afterEach;
+const beforeEach = require("mocha").beforeEach;
+const before = require("mocha").before;
+const describe = require("mocha").describe;
+const it = require("mocha").it;
+
+const sandbox = sinon.sandbox.create();
+const request = function (url, callback) {
   callback();
 };
 
@@ -45,7 +54,7 @@ describe('download', function () {
     mockery.registerMock('request', request);
     podcastParser = require('../index.js');
 
-    podcastParser.download('', {}, function (err, data) {
+    podcastParser.download('', function (err) {
       should.exist(err);
       done();
     });
@@ -56,7 +65,7 @@ describe('download', function () {
     mockery.registerMock('request', requestNerdcast);
     podcastParser = require('../index.js');
 
-    podcastParser.download('nerdcast', {}, function (err, data) {
+    podcastParser.download('nerdcast', function (err, data) {
       data.length.should.be.equal(4378642);
       done();
     });
@@ -67,10 +76,41 @@ describe('download', function () {
     mockery.registerMock('request', requestNerdcast);
     podcastParser = require('../index.js');
 
-    podcastParser.download('nerdcast', {}, function (err, data) {
+    podcastParser.download('nerdcast', function (err, data) {
       should.exist(data);
       done();
     });
-
   });
+
+	it('download - the default timeout must be 30', function (done) {
+		mockery.registerMock('request', requestTimeout);
+		podcastParser = require('../index.js');
+
+		podcastParser.download('asd', function (err, data) {
+			data.timeout.should.be.equal(30);
+			done();
+		});
+
+	});
+
+	it('download - timeout should be 60 when passing 60 as timeout in the options', function (done) {
+		mockery.registerMock('request', requestTimeout);
+		podcastParser = require('../index.js');
+
+		podcastParser.download('asd', { timeout: 60 }, function (err, data) {
+			data.timeout.should.be.equal(60);
+			done();
+		});
+
+	});
+
+	it('download - should give a error, when request has timeout', function (done) {
+		mockery.registerMock('request', requestTimeoutError);
+		podcastParser = require('../index.js');
+
+		podcastParser.download('asd', {}, function (err) {
+			should.exist(err);
+			done();
+		});
+	});
 });

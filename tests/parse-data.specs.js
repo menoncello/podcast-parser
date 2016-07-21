@@ -1,12 +1,19 @@
 'use strict';
 
-let chai = require('chai');
-let should = chai.should();
-let sinon = require('sinon');
-let mockery = require('mockery');
+const chai = require('chai');
+const should = chai.should();
+const sinon = require('sinon');
+const mockery = require('mockery');
 
-let sandbox = sinon.sandbox.create();
-let request = function (url, callback) {
+const after = require("mocha").after;
+const afterEach = require("mocha").afterEach;
+const beforeEach = require("mocha").beforeEach;
+const before = require("mocha").before;
+const describe = require("mocha").describe;
+const it = require("mocha").it;
+
+const sandbox = sinon.sandbox.create();
+const request = function (url, callback) {
     callback();
   };
 
@@ -42,7 +49,7 @@ describe('parse', function () {
     });
 
   it('should return error if data is empty', function (done) {
-    podcastParser.parse('', {}, function (err, data) {
+    podcastParser.parse('', {}, function (err) {
         should.exist(err);
         done();
       });
@@ -50,7 +57,7 @@ describe('parse', function () {
 
   it('should return existing object when passing a xml only with the rss',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss></rss>';
+      const xml = '<?xml version="1.0" encoding="UTF-8"?><rss></rss>';
 
       podcastParser.parse(xml, {}, function (err, data) {
         should.exist(data);
@@ -60,7 +67,7 @@ describe('parse', function () {
 
   it('should return version \'2.0\' when passing a xml only with the rss',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"></rss>';
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"></rss>';
 
       podcastParser.parse(xml, {}, function (err, data) {
         data.version.should.equal('2.0');
@@ -70,7 +77,7 @@ describe('parse', function () {
 
   it('should channel exists when passing a channel element in the feed',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel></channel></rss>';
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel></channel></rss>';
 
       podcastParser.parse(xml, {}, function (err, data) {
         should.exist(data.channel);
@@ -80,7 +87,7 @@ describe('parse', function () {
 
   it('should channel be a object when passing a channel element in the feed',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel>' +
         '</channel></rss>';
 
       podcastParser.parse(xml, {}, function (err, data) {
@@ -91,7 +98,7 @@ describe('parse', function () {
 
   it('should return existing items when passing a xml only with the rss',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss></rss>';
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss></rss>';
 
       podcastParser.parse(xml, {}, function (err, data) {
         should.exist(data.channel.items);
@@ -101,7 +108,7 @@ describe('parse', function () {
 
   it('should return existing items when passing a xml only with the rss',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss></rss>';
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss></rss>';
 
       podcastParser.parse(xml, {}, function (err, data) {
         data.channel.items.should.be.a('array');
@@ -111,7 +118,7 @@ describe('parse', function () {
 
   it('should title equals to \'Nerdcast – Jovem Nerd\' when passing the title element',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel>' +
         '<title>Nerdcast &#8211; Jovem Nerd</title></channel></rss>';
 
       podcastParser.parse(xml, {}, function (err, data) {
@@ -122,7 +129,7 @@ describe('parse', function () {
 
   it('should link equals to \'https://jovemnerd.com.br\' when passing the link element',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel>' +
         '<link>https://jovemnerd.com.br</link></channel></rss>';
 
       podcastParser.parse(xml, {}, function (err, data) {
@@ -134,7 +141,7 @@ describe('parse', function () {
   it('should description equals to \'O mundo pop vira piada no Jovem Nerd\' when passing ' +
       'the description element',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel>' +
         '<description>O mundo pop vira piada no Jovem Nerd</description></channel></rss>';
 
       podcastParser.parse(xml, {}, function (err, data) {
@@ -145,7 +152,7 @@ describe('parse', function () {
 
   it('should language equals to \'pt-BR\' when passing the language element',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel>' +
         '<language>pt-BR</language></channel></rss>';
 
       podcastParser.parse(xml, {}, function (err, data) {
@@ -156,7 +163,7 @@ describe('parse', function () {
 
   it('should items have 3 items when passing 3 tags',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel>' +
         '<item></item><item></item><item></item></channel></rss>';
 
       podcastParser.parse(xml, {}, function (err, data) {
@@ -168,7 +175,7 @@ describe('parse', function () {
   it('should the first item have the title \'Nerdcast 514 – Turistas Babacas 2\' ' +
     'when the title tag',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
         '<title>Nerdcast 514 &#8211; Turistas Babacas 2</title></item></channel></rss>';
 
       podcastParser.parse(xml, {}, function (err, data) {
@@ -180,7 +187,7 @@ describe('parse', function () {
   it('should the first item have the link ' +
     '\'https://jovemnerd.com.br/nerdcast/nerdcast-514-turistas-babacas-2/\' when the link tag',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
         '<link>https://jovemnerd.com.br/nerdcast/nerdcast-514-turistas-babacas-2/</link>' +
         '</item></channel></rss>';
 
@@ -194,7 +201,7 @@ describe('parse', function () {
   it('should the first item have the pubDate ' +
     '\'Fri, 29 Apr 2016 06:28:29 +0000\' when the link tag and options set date as string',
       function (done) {
-        let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+	      const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
           '<pubDate>Fri, 29 Apr 2016 06:28:29 +0000</pubDate>' +
           '</item></channel></rss>';
 
@@ -207,7 +214,7 @@ describe('parse', function () {
   it('should the first item have the pubDate as type of string ' +
     '\'Fri, 29 Apr 2016 06:28:29 +0000\' when the link tag and options set date as string',
       function (done) {
-        let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+	      const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
           '<pubDate>Fri, 29 Apr 2016 06:28:29 +0000</pubDate>' +
           '</item></channel></rss>';
 
@@ -220,7 +227,7 @@ describe('parse', function () {
   it('should the first item have the pubDate ' +
     '\'Fri, 29 Apr 2016 06:28:29 +0000\' when the link tag and options',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
         '<pubDate>Fri, 29 Apr 2016 06:28:29 +0000</pubDate>' +
         '</item></channel></rss>';
 
@@ -233,7 +240,7 @@ describe('parse', function () {
   it('should the first item have the pubDate ' +
     '\'20160329062829\' when the link tag and options set date as number',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
         '<pubDate>Fri, 29 Apr 2016 06:28:29 +0000</pubDate>' +
         '</item></channel></rss>';
 
@@ -246,7 +253,7 @@ describe('parse', function () {
   it('should the first item have the pubDate to be a `number` ' +
     ' when the link tag and options set date as number',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
         '<pubDate>Fri, 29 Apr 2016 06:28:29 +0000</pubDate>' +
         '</item></channel></rss>';
 
@@ -259,7 +266,7 @@ describe('parse', function () {
   it('should the first item have the pubDate as `date`' +
     'when the link tag and options set date as string',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
         '<pubDate>Fri, 29 Apr 2016 06:28:29 +0000</pubDate>' +
         '</item></channel></rss>';
 
@@ -272,7 +279,7 @@ describe('parse', function () {
   it('should the first item have the pubDate \'Fri, 29 Apr 2016 06:28:29 +0000\' as date ' +
     'when the link tag and options set date as string',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
         '<pubDate>Fri, 29 Apr 2016 06:28:29 +0000</pubDate>' +
         '</item></channel></rss>';
 
@@ -285,7 +292,7 @@ describe('parse', function () {
   it('should the first item have the pubDate [2016, 3, 29, 6, 28, 29] ' +
     'when the link tag and options set date as array',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
         '<pubDate>Fri, 29 Apr 2016 06:28:29 +0000</pubDate>' +
         '</item></channel></rss>';
 
@@ -300,7 +307,7 @@ describe('parse', function () {
     'de Turistas Babacas!</p><p>O post Nerdcast 514 – Turistas Babacas 2 apareceu primeiro' +
     ' em Jovem Nerd.</p>\' when the link tag and options set date as array',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
         '<description><![CDATA[<p>Hoje Alexandre Ottoni o Jovem Nerd, Sr. K, Guga Mafra, ' +
         'Portuguesa e Deive Pazos o Azaghal colocam seus monóculos para a segunda parte de ' +
         'Turistas Babacas!</p><p>O post Nerdcast 514 &#8211; Turistas Babacas 2 apareceu primeiro' +
@@ -318,7 +325,7 @@ describe('parse', function () {
   it('should the first item have the duration 1:41:56 ' +
     'when the link tag \'itunes:duration\'',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
         '<itunes:duration>1:41:56</itunes:duration>' +
         '</item></channel></rss>';
 
@@ -331,7 +338,7 @@ describe('parse', function () {
   it('should the first item have the duration [1,41,56] ' +
     'when the link tag \'itunes:duration\' and set time as array',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
         '<itunes:duration>1:41:56</itunes:duration>' +
         '</item></channel></rss>';
 
@@ -344,7 +351,7 @@ describe('parse', function () {
   it('should the first item have the duration 14156 ' +
     'when the link tag \'itunes:duration\' and set time as number',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
         '<itunes:duration>1:41:56</itunes:duration>' +
         '</item></channel></rss>';
 
@@ -356,7 +363,7 @@ describe('parse', function () {
 
   it('should the first item have a enclosure when the link tag \'enclosure\'',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
         '<enclosure url="https://jovemnerd.com.br/podpress_trac/feed/148003/0/nc514.mp3" ' +
         'length="73512785" type="audio/mpeg" />' +
         '</item></channel></rss>';
@@ -370,7 +377,7 @@ describe('parse', function () {
   it('should the first item have a enclosure with url, length and type when the link tag' +
       ' \'enclosure\'',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
         '<enclosure url="https://jovemnerd.com.br/podpress_trac/feed/148003/0/nc514.mp3" ' +
         'length="73512785" type="audio/mpeg" />' +
         '</item></channel></rss>';
@@ -390,7 +397,7 @@ describe('parse', function () {
       'parte de Turistas Babacas! O post Nerdcast 514 – Turistas Babacas 2 apareceu ' +
       'primeiro em Jovem Nerd.\' tag \'itunes:subtitle\'',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
         '<itunes:subtitle>Hoje Alexandre Ottoni o Jovem Nerd, Sr. K, Guga Mafra, Portuguesa e ' +
         'Deive Pazos o Azaghal colocam seus monóculos para a segunda parte de Turistas Babacas! O' +
         ' post Nerdcast 514 &#8211; Turistas Babacas 2 apareceu primeiro em Jovem Nerd.' +
@@ -411,7 +418,7 @@ describe('parse', function () {
       'parte de Turistas Babacas! O post Nerdcast 514 – Turistas Babacas 2 apareceu ' +
       'primeiro em Jovem Nerd.\' tag \'itunes:summary\'',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
         '<itunes:summary>Hoje Alexandre Ottoni o Jovem Nerd, Sr. K, Guga Mafra, Portuguesa e ' +
         'Deive Pazos o Azaghal colocam seus monóculos para a segunda parte de Turistas Babacas! O' +
         ' post Nerdcast 514 &#8211; Turistas Babacas 2 apareceu primeiro em Jovem Nerd.' +
@@ -434,7 +441,7 @@ describe('parse', function () {
       '</blockquote><h3>N­PIX | Escola online de artes digitais</h3><p>Acesse: <a ' +
       'href="http://bit.ly/1NWTv83">http://bit.ly/1NWTv83</a></p>.\' tag \'content:encoded\'',
     function (done) {
-      let xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
+	    const xml = '<?xml version="1.0" encoding="UTF-8"?><rss><channel><item>' +
         '<content:encoded><![CDATA[<p><strong>Neste Podcast:</strong> Vá para uma festa em um ' +
         'castelo em praga, se inspire na família Griswald e conheça o Willy Wonka do inferno!</p>' +
         '<blockquote><p><strong>ARTE DA VITRINE: <strong><em><a ' +

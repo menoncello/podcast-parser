@@ -40,6 +40,19 @@ podcastParser.download(
 		console.log(res);
 	});
 
+// podcastParser.download(url, options, callback)
+podcastParser.download(
+  'http://feeds.serialpodcast.org/serialpodcast',
+  { timeout: 60 },
+  function (err, res) {
+		if (err) {
+			console.log(err);
+			return;
+		}
+
+		console.log(res);
+	});
+
 // podcastParser.parse(xml, options, callback)
 podcastParser.parse(
   '<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel>' +
@@ -75,13 +88,16 @@ Given the feed url, returns the object representation of the feed
     - `string`: return as `string`: `1:41:56`
     - `array`: return as `array`: `[ 1, 41, 56 ]`
     - `number`: return as `number`: `14156`
+  - **number** 'timeout': will give timeout on waiting for the download. (default: `string`)
 - **Function** 'callback': The callback function.
 
-### `podcastParser.download(url, callback)`
+### `podcastParser.download(url, [options], callback)`
 Download the feed from the URL
 
 #### Params
 - **String** 'url': The podcast's feed.
+- **Object** 'options': The options passed to podcast parser method.
+  - **number** 'timeout': will give timeout on waiting for the download. (default: `string`)
 - **Function** 'callback': The callback function.
 
 ### `podcastParser.parse(xml, options, callback)`

@@ -1,10 +1,11 @@
 'use strict';
 
-let request = require('request');
-let parseString = require('xml2js').parseString;
-let dateHelper = require('./helpers/date-helper.js');
-let _ = require('underscore');
-let S = require('string');
+const request = require('request');
+const parseString = require('xml2js').parseString;
+const dateHelper = require('./helpers/date-helper.js');
+const _ = require('underscore');
+const S = require('string');
+const util = require('util');
 
 exports.execute = execute;
 exports.download = download;
@@ -33,14 +34,28 @@ function execute(url, options, callback) {
 }
 
 function download(url, options, callback) {
-  if (!url) {
-    callback({ text: 'url is required' });
-    return;
+	if (util.isFunction(options)) {
+		callback = options;
+		options = {};
+	}
+
+	if (!url) {
+    return callback({ text: 'url is required' });
   }
 
-  request(url, downloaded);
+  options = options || {};
 
-  function downloaded(err, response, body) {
+  let requestOptions = {
+  	timeout: options.timeout || 30
+  };
+
+  request(url, requestOptions, downloaded);
+
+  function downloaded(err, body) {
+  	if (err) {
+  		return callback(err);
+	  }
+
     callback(null, body);
   }
 }
