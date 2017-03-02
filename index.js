@@ -96,6 +96,17 @@ function parse(xml, options, callback) {
         getField(channel[0], result.channel, 'description');
         getField(channel[0], result.channel, 'language');
 
+		try { 
+			let imageUrl = channel[0]['itunes:image'].pop().$.href;
+			if (imageUrl && imageUrl.length > 2) {
+				result.channel.image = imageUrl;
+			} else {
+				result.channel.image = null;
+			}
+		} catch (ex) {
+			result.channel.image = null;
+		}
+		
         if (channel[0].item && channel[0].item.length > 0) {
           for (let i = 0; i < channel[0].item.length; i++) {
             let rssItem = channel[0].item[i];
