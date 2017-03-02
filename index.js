@@ -98,12 +98,12 @@ function parse(xml, options, callback) {
 
 		try { 
 			let imageUrl = channel[0]['itunes:image'].pop().$.href;
-			if (imageUrl !== undefined && imageUrl.length > 2){
+			if (imageUrl && imageUrl.length > 2) {
 				result.channel.image = imageUrl;
 			} else {
 				result.channel.image = null;
 			}
-		} catch (ex){
+		} catch (ex) {
 			result.channel.image = null;
 		}
 		
