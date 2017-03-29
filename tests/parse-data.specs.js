@@ -356,7 +356,7 @@ describe('parse', function () {
         '</item></channel></rss>';
 
       podcastParser.parse(xml, { timeAs: 'number' }, function (err, data) {
-        data.channel.items[0].duration.should.equal(14156);
+        data.channel.items[0].duration.should.equal(564101);
         done();
       });
     });

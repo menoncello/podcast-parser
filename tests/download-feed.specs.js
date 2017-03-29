@@ -66,7 +66,7 @@ describe('download', function () {
     podcastParser = require('../index.js');
 
     podcastParser.download('nerdcast', function (err, data) {
-      data.length.should.be.equal(4378642);
+      data.length.should.be.equal(4439535);
       done();
     });
 
