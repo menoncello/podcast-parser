@@ -4,8 +4,9 @@ const request = require('request');
 const parseString = require('xml2js').parseString;
 const dateHelper = require('./helpers/date-helper.js');
 const _ = require('underscore');
-const S = require('string');
+const v = require('voca');
 const util = require('util');
+const entities = new require('html-entities').AllHtmlEntities;
 
 exports.execute = execute;
 exports.download = download;
@@ -131,7 +132,7 @@ function parse(xml, options, callback) {
             }
 
             if (item.description) {
-              item.description = S(item.description).unescapeHTML().s;
+              item.description = entities.decode(item.description);
             }
 
             if (item.duration && options.timeAs === 'array') {
