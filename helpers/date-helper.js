@@ -1,6 +1,6 @@
 'use strict';
 
-let S = require('string');
+const v = require('voca');
 
 exports.month = monthHelper;
 exports.arrayDate = arrayDateHelper;
@@ -29,7 +29,7 @@ function monthHelper(month) {
 }
 
 function arrayDateHelper(date) {
-  date = S(date).replaceAll(':', '-').slugify().s;
+  date = v(date).replaceAll(':', '-').slugify();
   let dateArr = date.split('-');
 
   // console.log(dateArr);
